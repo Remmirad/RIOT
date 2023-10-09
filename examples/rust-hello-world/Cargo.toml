@@ -15,7 +15,7 @@ crate-type = ["staticlib"]
 panic = "abort"
 
 [patch.crates-io]
-riot-sys = { path = "../../rust-riot-sys"}
+riot-sys = { path = "../../../rust-riot-sys"}
 
 [dependencies]
 riot-wrappers = { version = "0.8", features = [ "set_panic_handler" ] }
