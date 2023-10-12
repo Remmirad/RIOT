@@ -6,3 +6,4 @@
 
 [patch.crates-io]
 riot-wrappers = { git = "https://github.com/RIOT-OS/rust-riot-wrappers" }
+riot-sys = { git = "https://github.com/Remmirad/rust-riot-sys.git", branch = "NOG"}
