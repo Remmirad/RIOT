@@ -335,7 +335,7 @@ source = "git+https://gitlab.com/etonomy/riot-module-examples.git#09fa2d45e92ca4
 dependencies = [
  "embassy-executor",
  "riot-sys",
- "riot-wrappers 0.9.2 (git+https://github.com/RIOT-OS/rust-riot-wrappers)",
+ "riot-wrappers 0.9.2 (git+https://github.com/RIOT-OS/rust-riot-wrappers?rev=006e35d904417abbf97044ce1a1fc55bbb47a4a0)",
 ]
 
 [[package]]
@@ -826,7 +826,7 @@ checksum = "2b15c43186be67a4fd63bee50d0303afffcef381492ebe2c5d87f324e1b8815c"
 [[package]]
 name = "riot-sys"
 version = "0.7.15"
-source = "git+https://github.com/RIOT-OS/rust-riot-sys.git#4e99981b66305566740af7009482fdc0f6bd1192"
+source = "git+https://github.com/RIOT-OS/rust-riot-sys?rev=4e99981b66305566740af7009482fdc0f6bd1192#4e99981b66305566740af7009482fdc0f6bd1192"
 dependencies = [
  "bindgen",
  "c2rust-asm-casts",
@@ -872,7 +872,7 @@ dependencies = [
 [[package]]
 name = "riot-wrappers"
 version = "0.9.2"
-source = "git+https://github.com/RIOT-OS/rust-riot-wrappers#006e35d904417abbf97044ce1a1fc55bbb47a4a0"
+source = "git+https://github.com/RIOT-OS/rust-riot-wrappers?rev=006e35d904417abbf97044ce1a1fc55bbb47a4a0#006e35d904417abbf97044ce1a1fc55bbb47a4a0"
 dependencies = [
  "bare-metal",
  "coap-handler",
@@ -935,7 +935,7 @@ dependencies = [
 [[package]]
 name = "rusty-dtls"
 version = "0.1.0"
-source = "git+ssh://git@github.com/ATACAMA-Project/rusty-dtls.git#3af5214f56856247e0cb7a9a153542e3bd8e73e1"
+source = "git+ssh://git@github.com/ATACAMA-Project/rusty-dtls.git#ae6ed55f9be887e3067f1037eb793a20689046b3"
 dependencies = [
  "aes-gcm",
  "embassy-futures",

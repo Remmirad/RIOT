@@ -5,5 +5,5 @@
 # Cargo.toml, copy this file over, or just use the released versions.
 
 [patch.crates-io]
-riot-sys = { git = "https://github.com/RIOT-OS/rust-riot-sys" }
-riot-wrappers = { git = "https://github.com/RIOT-OS/rust-riot-wrappers" }
+riot-sys = { git = "https://github.com/RIOT-OS/rust-riot-sys", rev = "4e99981b66305566740af7009482fdc0f6bd1192" }
+riot-wrappers = { git = "https://github.com/RIOT-OS/rust-riot-wrappers", rev = "006e35d904417abbf97044ce1a1fc55bbb47a4a0" }
