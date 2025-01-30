@@ -111,11 +111,7 @@ async fn spawn_endpoint(port: u16, peer_port: u16, server: bool) {
     )
     .unwrap();
 
-    let mut handshakes = if server {
-        [HandshakeSlot::new(&psks, &mut buffer)]
-    } else {
-        [HandshakeSlot::new(&psks, &mut buffer)]
-    };
+    let mut handshakes = [HandshakeSlot::new(&psks, &mut buffer)];
     if !server {
         assert!(stack.open_connection(
             &mut handshakes[0],
@@ -128,6 +124,7 @@ async fn spawn_endpoint(port: u16, peer_port: u16, server: bool) {
 
     let mut i = 5;
     let mut id = None;
+    let mut receive_buf = [0u8; 11];
     loop {
         if i == 0 {
             print_peak_stack_usage();
@@ -138,28 +135,39 @@ async fn spawn_endpoint(port: u16, peer_port: u16, server: bool) {
         };
         match e {
             rusty_dtls::Event::AppData(_, range) => {
-                println!(
-                    "[{port}] Received Appdata: {}",
-                    core::str::from_utf8(&stack.staging_buffer()[range]).unwrap()
-                );
+                if server {
+                    receive_buf.copy_from_slice(&stack.staging_buffer()[range]);
+                    println!(
+                        "[{port}] Echo Appdata: {}",
+                        core::str::from_utf8(&receive_buf).unwrap()
+                    );
+                    if let Some(id) = id {
+                        stack.send_dtls_packet(id, &receive_buf).await.unwrap();
+                    }
+                } else {
+                    println!(
+                        "[{port}] Received Appdata: {}",
+                        core::str::from_utf8(&stack.staging_buffer()[range]).unwrap()
+                    );
+                }
                 i -= 1;
             }
             rusty_dtls::Event::OpenedConnection => {
                 id = handshakes[0].try_take_connection_id();
                 println!("[{port}] Opened connection id {id:?}");
             }
+            rusty_dtls::Event::Timeout => {
+                if !server {
+                    if let Some(id) = id {
+                        stack
+                            .send_dtls_packet(id, "Hello World".as_bytes())
+                            .await
+                            .unwrap();
+                    }
+                }
+            }
             _ => {}
         };
-        if !server {
-            if let Some(id) = id {
-                println!("Seinding");
-                stack
-                    .send_dtls_packet(id, "Hello World".as_bytes())
-                    .await
-                    .unwrap();
-                i -= 1;
-            }
-        }
     }
 }
 

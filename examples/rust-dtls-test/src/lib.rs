@@ -14,11 +14,11 @@ use {
 
 use riot_wrappers::println;
 use riot_wrappers::riot_main;
+use riot_wrappers::riot_sys;
 use riot_wrappers::socket_embedded_nal::Stack;
 use riot_wrappers::socket_embedded_nal::StackAccessor;
 use riot_wrappers::socket_embedded_nal::UdpSocket;
 use riot_wrappers::ztimer::LockedClock;
-use riot_wrappers::{gnrc::Netif, riot_sys};
 
 use embedded_nal::nb::Error;
 use embedded_nal::SocketAddr;
@@ -87,8 +87,7 @@ fn read_blocking<'a>(
             }
             Err(Error::WouldBlock) => {}
             Err(Error::Other(e)) => {
-                println!("{e:?}, {}", riot_sys::EAGAIN);
-                // panic!("{e:?}");
+                panic!("{e:?}");
             }
         }
         if time > time_end {
@@ -103,9 +102,11 @@ fn spawn_endpoint(mut stack: StackAccessor<'_, 1>, port: u16, peer_port: u16, se
     stack.bind(&mut socket, port).unwrap();
     let mut socket = (socket, stack);
 
+    println!("[{port}] Bound on port {}", port);
+
     let clock = riot_wrappers::ztimer::Clock::msec();
     let clock = clock.acquire();
-    let mut receive_buf = [0u8; 128];
+    let mut receive_buf = [0u8; 11];
 
     let mut i = MESSAGES;
     if server {
@@ -155,9 +156,9 @@ fn spawn_endpoint_dtls(mut stack: StackAccessor<'_, 1>, port: u16, peer_port: u1
     let socket = RefCell::new((socket, stack));
     let i = RefCell::new(MESSAGES);
 
-    println!("[{port}] bound on port {}", port);
+    println!("[{port}] Bound on port {}", port);
 
-    let mut receive_buf = [0u8; 128];
+    let mut receive_buf = [0u8; 11];
     #[cfg(not(feature = "netqueue"))]
     let mut buffer = [0; 512];
     #[cfg(feature = "netqueue")]
@@ -165,7 +166,6 @@ fn spawn_endpoint_dtls(mut stack: StackAccessor<'_, 1>, port: u16, peer_port: u1
     let mut staging_buffer = [0; 256];
 
     let mut send_to_peer = |addr: &core::net::SocketAddr, buf: &[u8]| {
-        println!("[{port}] Send message. Size: {}", buf.len());
         let mut socket = socket.borrow_mut();
         let (s, st) = socket.deref_mut();
         st.send_to(s, to_nal_addr(addr), buf).unwrap();
@@ -219,7 +219,6 @@ fn spawn_endpoint_dtls(mut stack: StackAccessor<'_, 1>, port: u16, peer_port: u1
         let poll = stack.poll(&mut handshakes, (time - start) as u64).unwrap();
         match poll {
             DtlsPoll::WaitTimeoutMs(ms) => {
-                println!("[{port}] Wait {ms}");
                 if let Some((read, addr)) =
                     read_blocking_dtls(stack.staging_buffer(), &socket, ms, &clock)
                 {
@@ -228,24 +227,21 @@ fn spawn_endpoint_dtls(mut stack: StackAccessor<'_, 1>, port: u16, peer_port: u1
                         .unwrap();
                 }
             }
-            DtlsPoll::Wait => {
-                println!("[{port}] Wait");
-                loop {
-                    if let Some((read, addr)) =
-                        read_blocking_dtls(stack.staging_buffer(), &socket, 5000, &clock)
-                    {
-                        stack
-                            .handle_dtls_packet(&mut handshakes, &addr, read, &mut handle_app_data)
-                            .unwrap();
-                        break;
-                    } else {
-                        if let Some(id) = server_id {
-                            *i.borrow_mut() -= 1;
-                            stack.send_dtls_packet(id, b"Hello world").unwrap();
-                        }
+            DtlsPoll::Wait => loop {
+                if let Some((read, addr)) =
+                    read_blocking_dtls(stack.staging_buffer(), &socket, 5000, &clock)
+                {
+                    stack
+                        .handle_dtls_packet(&mut handshakes, &addr, read, &mut handle_app_data)
+                        .unwrap();
+                    break;
+                } else {
+                    if let Some(id) = server_id {
+                        *i.borrow_mut() -= 1;
+                        stack.send_dtls_packet(id, b"Hello world").unwrap();
                     }
                 }
-            }
+            },
             DtlsPoll::FinishedHandshake => {
                 for hs in &mut handshakes {
                     let Some(id) = hs.try_take_connection_id() else {
@@ -265,12 +261,6 @@ fn main() -> ! {
     log::set_logger(&LOGGER)
         .map(|_| log::set_max_level(log::LevelFilter::Info))
         .expect("set Riot Logger");
-    riot_wrappers::ztimer::Clock::msec().sleep(riot_wrappers::ztimer::Ticks(2000));
-
-    for (i, nif) in Netif::all().enumerate() {
-        println!("NetIf {} {:02x?}", i, nif.l2addr());
-    }
-
     let ip_addr = riot_wrappers::gnrc::Netif::all()
         .next()
         .expect("We need a netif")
@@ -279,11 +269,8 @@ fn main() -> ! {
         .first()
         .unwrap()
         .clone();
-    println!("IP Addr: {:?}", ip_addr);
     let mut stack: Stack<1> = Stack::new();
-
     stack.run(|stack| {
-        println!("Run in stack");
         if ip_addr.raw() == &SERVER_ADDR.octets() {
             #[cfg(feature = "dtls")]
             spawn_endpoint_dtls(stack, 64777, 64774, true);

@@ -841,7 +841,7 @@ dependencies = [
 [[package]]
 name = "riot-wrappers"
 version = "0.9.2"
-source = "git+https://github.com/Remmirad/rust-riot-wrappers.git?branch=embedded-nal-async-0.8.0#0e1e4f38db72ce8abd90a03103e7f2aec25428c4"
+source = "git+https://github.com/Remmirad/rust-riot-wrappers.git?branch=embedded-nal-async-0.8.0#9813b6a10634a21911b906cf581fad907a3dfef1"
 dependencies = [
  "bare-metal",
  "coap-handler",

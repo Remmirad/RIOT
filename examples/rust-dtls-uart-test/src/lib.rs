@@ -108,7 +108,7 @@ fn spawn_endpoint(
 ) {
     let clock = riot_wrappers::ztimer::Clock::msec();
     let locked_clock = clock.acquire();
-    let mut recv_buf = [0u8; 128];
+    let mut recv_buf = [0u8; 11];
 
     let mut i = MESSAGES;
     if server {
@@ -150,14 +150,13 @@ fn spawn_endpoint_dtls(
 ) {
     let i = RefCell::new(MESSAGES);
 
-    println!("[{port}] bound on port {}", port);
+    println!("[{port}] Bound on port {}", port);
 
     let mut send_to_peer = |addr: &core::net::SocketAddr, buf: &[u8]| {
-        println!("[{port}] Send message. Size: {}", buf.len());
         let clock = riot_wrappers::ztimer::Clock::msec();
         uart_tx.send(&clock, buf);
     };
-    let mut receive_buf: [u8; 128] = [0u8; 128];
+    let mut receive_buf: [u8; 11] = [0u8; 11];
     let mut buffer: [u8; 512] = [0; 512];
     let mut staging_buffer: [u8; 256] = [0; 256];
 
@@ -211,7 +210,6 @@ fn spawn_endpoint_dtls(
         let poll = stack.poll(&mut handshakes, (time - start) as u64).unwrap();
         match poll {
             DtlsPoll::WaitTimeoutMs(ms) => {
-                println!("[{port}] Wait {ms}");
                 if let Some(read) = read_blocking_dtls(uart_buf, stack.staging_buffer(), ms, &clock)
                 {
                     stack
@@ -219,29 +217,21 @@ fn spawn_endpoint_dtls(
                         .unwrap();
                 }
             }
-            DtlsPoll::Wait => {
-                println!("[{port}] Wait");
-                loop {
-                    if let Some(read) =
-                        read_blocking_dtls(uart_buf, stack.staging_buffer(), 5000, &clock)
-                    {
-                        stack
-                            .handle_dtls_packet(
-                                &mut handshakes,
-                                other_addr,
-                                read,
-                                &mut handle_app_data,
-                            )
-                            .unwrap();
-                        break;
-                    } else {
-                        if let Some(id) = server_id {
-                            *i.borrow_mut() -= 1;
-                            stack.send_dtls_packet(id, b"Hello world").unwrap();
-                        }
+            DtlsPoll::Wait => loop {
+                if let Some(read) =
+                    read_blocking_dtls(uart_buf, stack.staging_buffer(), 5000, &clock)
+                {
+                    stack
+                        .handle_dtls_packet(&mut handshakes, other_addr, read, &mut handle_app_data)
+                        .unwrap();
+                    break;
+                } else {
+                    if let Some(id) = server_id {
+                        *i.borrow_mut() -= 1;
+                        stack.send_dtls_packet(id, b"Hello world").unwrap();
                     }
                 }
-            }
+            },
             DtlsPoll::FinishedHandshake => {
                 for hs in &mut handshakes {
                     let Some(id) = hs.try_take_connection_id() else {
@@ -336,7 +326,7 @@ fn main() -> ! {
         );
     }
 
-    let is_server = true;
+    let is_server = false;
     if is_server {
         #[cfg(feature = "dtls")]
         spawn_endpoint_dtls(uart_tx, &mut uart_buf, 64777, 64774, true);
