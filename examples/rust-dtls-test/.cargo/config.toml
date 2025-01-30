@@ -1,0 +1,7 @@
+[env]
+RIOT_COMPILE_COMMANDS_JSON = "<path to RIOT>/examples/rust-dtls-test/bin/feather-nrf52840/cargo-compile-commands.json"
+RIOTBUILD_CONFIG_HEADER_C = "<path to RIOT>/examples/rust-dtls-test/bin/feather-nrf52840/riotbuild/riotbuild.h"
+RIOTBASE = "<path to RIOT>"
+
+[build]
+target = "thumbv7em-none-eabihf"
