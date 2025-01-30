@@ -4,7 +4,7 @@ BOARD ?= feather-nrf52840
 RIOTBASE ?= $(CURDIR)/../../
 
 DEVELHELP ?= 1
-QUIET ?= 0
+QUIET ?= 1
 
 APPLICATION_RUST_MODULE = rust_dtls_test
 BASELIBS += $(APPLICATION_RUST_MODULE).module

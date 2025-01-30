@@ -738,7 +738,8 @@ dependencies = [
 [[package]]
 name = "riot-wrappers"
 version = "0.9.2"
-source = "git+https://github.com/RIOT-OS/rust-riot-wrappers.git#006e35d904417abbf97044ce1a1fc55bbb47a4a0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c871a3f4aa6be75a4c7ef77afe5eba9fe87280336233d3b87000531d53f91033"
 dependencies = [
  "bare-metal",
  "coap-handler",
