@@ -1,0 +1,28 @@
+[package]
+name = "rust-dtls-async-test"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+crate-type = ["staticlib"]
+
+[profile.release]
+opt-level = "z"
+debug = false
+strip = true
+lto = true
+codegen-units = 1
+panic = "abort"
+
+[dependencies]
+riot-wrappers = { git = "https://github.com/Remmirad/rust-riot-wrappers.git", branch = "embedded-nal-async-0.8.0", features = [ "with_embedded_nal_async", "with_embedded_hal_async", "provide_critical_section_1_0"] }
+embassy-executor-riot = { git = "https://gitlab.com/etonomy/riot-module-examples.git"}
+embedded-nal-async = { version = "0.8.0"}
+embassy-executor = { version = "0.5.0"}
+embassy-futures = "0.1.1"
+
+rusty-dtls = { git = "ssh://git@github.com/ATACAMA-Project/rusty-dtls.git", features = ["aes128gcm_sha256", "async", "silent"]}
+embedded-time = { version = "0.12.1", default-features = false }
+log = "0.4.21"
+
+rust_riotmodules = { path = "../../sys/rust_riotmodules/" }
