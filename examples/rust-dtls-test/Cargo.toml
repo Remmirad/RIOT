@@ -15,7 +15,7 @@ codegen-units = 1
 panic = "abort"
 
 [dependencies]
-riot-wrappers = { version = "*", features = [ "with_embedded_nal", "set_panic_handler", "panic_handler_format"] }
+riot-wrappers = { version = "0.9.2", features = [ "with_embedded_nal", "set_panic_handler", "panic_handler_format"] }
 embedded-nal = "0.6.0"
 rusty-dtls = { git  = "ssh://git@github.com/ATACAMA-Project/rusty-dtls.git", features = ["aes128gcm_sha256", "silent"], optional = true}
 embedded-time = { version = "0.12.1", default-features = false }
