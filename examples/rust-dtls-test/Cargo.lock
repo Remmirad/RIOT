@@ -810,7 +810,7 @@ dependencies = [
 [[package]]
 name = "rusty-dtls"
 version = "0.1.0"
-source = "git+ssh://git@github.com/ATACAMA-Project/rusty-dtls.git#ae6ed55f9be887e3067f1037eb793a20689046b3"
+source = "git+ssh://git@github.com/ATACAMA-Project/rusty-dtls.git#1a173f75d023a02369bea1452feb7ee8da052e5e"
 dependencies = [
  "aes-gcm",
  "heapless 0.8.0",
