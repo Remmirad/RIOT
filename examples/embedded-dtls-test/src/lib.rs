@@ -25,7 +25,6 @@ use embedded_dtls::TxEndpoint;
 use embedded_hal_async::delay::DelayNs;
 use embedded_nal_async::UdpStack as _;
 use embedded_nal_async::UnconnectedUdp as _;
-use log::info;
 use riot_wrappers::println;
 use riot_wrappers::random::Random;
 use riot_wrappers::riot_main;
@@ -153,14 +152,14 @@ impl ApplicationDataSender for AppRx {
     type Error = ();
 
     async fn send(&mut self, data: impl AsRef<[u8]>) -> Result<(), Self::Error> {
-        if self.i == 0 {
-            return Err(());
-        }
         self.i -= 1;
         println!(
             "Echo Appdata: {}",
             core::str::from_utf8(data.as_ref()).unwrap()
         );
+        if self.i == 1 {
+            return Err(());
+        }
         Ok(())
     }
 }
@@ -207,7 +206,6 @@ async fn spawn_endpoint(port: u16, peer_port: u16, server: bool) {
     };
 
     if server {
-        println!("Server");
         let server_config = ServerConfig { psk: &[psk] };
         let server_connection = open_server(rx, tx, &server_config, &mut rng, &mut rx_buf)
             .await
@@ -217,7 +215,6 @@ async fn spawn_endpoint(port: u16, peer_port: u16, server: bool) {
             .run(&mut rx_buf, &mut tx_buf, &mut app_rx, &mut app_tx, Delay)
             .await;
     } else {
-        info!("Client");
         app_tx.is_client = true;
         let client_config = ClientConfig {
             psk: Psk {
