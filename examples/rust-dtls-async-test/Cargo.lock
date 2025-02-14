@@ -190,9 +190,9 @@ dependencies = [
 
 [[package]]
 name = "coap-numbers"
-version = "0.2.4"
+version = "0.2.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6d78a5634393ab2c11d173d66107200a730e200a3b3ca063c344d4459c90a5f9"
+checksum = "60eaa05d595b25bfc6f42c7115435edb525ce084cd17603368d18f1d5c42ec4a"
 
 [[package]]
 name = "cpufeatures"
@@ -716,9 +716,9 @@ dependencies = [
 
 [[package]]
 name = "once_cell"
-version = "1.20.2"
+version = "1.20.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1261fe7e33c73b354eab43b1273a57c8f967d0391e80353e51f764ac02cf6775"
+checksum = "945462a4b81e43c4e3ba96bd7b49d834c6f61198356aa858733bc4acf3cbe62e"
 
 [[package]]
 name = "opaque-debug"
@@ -935,7 +935,7 @@ dependencies = [
 [[package]]
 name = "rusty-dtls"
 version = "0.1.0"
-source = "git+ssh://git@github.com/ATACAMA-Project/rusty-dtls.git#7e8dadb9b11e7091b06d49db8e42a111ac0ea2b2"
+source = "git+ssh://git@github.com/ATACAMA-Project/rusty-dtls.git#33df8a28f83b64b3e9cc20ca1a34e13a707ce120"
 dependencies = [
  "aes-gcm",
  "embassy-futures",

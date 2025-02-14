@@ -1,4 +1,5 @@
-APPLICATION = rust-dtls-test
+APPLICATION = embedded-dtls-test
+
 BOARD ?= feather-nrf52840
 
 RIOTBASE ?= $(CURDIR)/../../
@@ -6,16 +7,23 @@ RIOTBASE ?= $(CURDIR)/../../
 DEVELHELP ?= 1
 QUIET ?= 1
 
-APPLICATION_RUST_MODULE = rust_dtls_test
+APPLICATION_RUST_MODULE = embedded_dtls_test
 BASELIBS += $(APPLICATION_RUST_MODULE).module
-
-FEATURES_REQUIRED += rust_target
 
 USEMODULE += netdev_default
 USEMODULE += auto_init_gnrc_netif
 USEMODULE += gnrc_ipv6_default
 USEMODULE += gnrc_netif_single
+
 USEMODULE += sock_udp
+USEMODULE += sock_aux_local
+USEMODULE += gnrc_sock_udp
+USEMODULE += gnrc_netapi_callbacks
+USEMODULE += gnrc_ipv6_static_addr
+
+USEMODULE += sock_async
+USEMODULE += gnrc_sock_async
+
 USEMODULE += random
 USEMODULE += prng_sha256prng
 
@@ -34,20 +42,18 @@ CFLAGS += '-DLOG_LEVEL=LOG_ALL'
 CFLAGS += '-DDEBUG_ASSERT_VERBOSE'
 CFLAGS += '-DTHREAD_STACKSIZE_MAIN=10000'
 
-CARGO_CHANNEL = stable
+CARGO_CHANNEL = nightly
 CARGO_PROFILE = release
 
-# Enable dtls and choose one retransmission option
-# CARGO_OPTIONS += --features dtls
-# Rt options
-# CARGO_OPTIONS += --features buffer
-# CARGO_OPTIONS += --features netqueue
+COMPILE_COMMANDS_PATH=$(CURDIR)/compile_commands.json
 
 PROGRAMMER = openocd
 OPENOCD_DEBUG_ADAPTER = stlink
 OPENOCD_TRANSPORT = swd
 
+FEATURES_REQUIRED += rust_target
+
 include $(RIOTBASE)/Makefile.include
 
 # Flashing fails with stlink otherwise because it does not support `nrf52_recover`
-OPENOCD_POST_INIT_CMDS = 
+OPENOCD_POST_INIT_CMDS =

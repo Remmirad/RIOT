@@ -9,8 +9,12 @@ use {
     core::cell::RefCell,
     core::ops::{DerefMut, Range},
     riot_wrappers::random::Random,
-    rusty_dtls::{ConnectionId, DtlsPoll, DtlsStack, HandshakeSlot, HashFunction, Psk},
 };
+
+#[cfg(feature = "buffer")]
+use rusty_dtls::{ConnectionId, DtlsPoll, DtlsStack, HandshakeSlot, HashFunction, Psk};
+#[cfg(feature = "netqueue")]
+use rusty_dtls_netqueue::{ConnectionId, DtlsPoll, DtlsStack, HandshakeSlot, HashFunction, Psk};
 
 use riot_wrappers::println;
 use riot_wrappers::riot_main;
@@ -162,7 +166,7 @@ fn spawn_endpoint_dtls(mut stack: StackAccessor<'_, 1>, port: u16, peer_port: u1
     #[cfg(not(feature = "netqueue"))]
     let mut buffer = [0; 512];
     #[cfg(feature = "netqueue")]
-    let mut net_queue = rusty_dtls::NetQueue::new();
+    let mut net_queue = rusty_dtls_netqueue::NetQueue::new();
     let mut staging_buffer = [0; 256];
 
     let mut send_to_peer = |addr: &core::net::SocketAddr, buf: &[u8]| {

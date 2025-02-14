@@ -1,0 +1,27 @@
+[package]
+name = "embedded-dtls-test"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+crate-type = ["staticlib"]
+
+[profile.release]
+opt-level = "z"
+debug = false
+strip = true
+lto = true
+codegen-units = 1
+panic = "abort"
+
+[dependencies]
+riot-wrappers = { git = "https://github.com/Remmirad/rust-riot-wrappers.git", branch = "embedded-nal-async-0.8.0", features = [ "with_embedded_nal_async", "with_embedded_hal_async", "provide_critical_section_1_0"] }
+embedded-nal-async = { version = "0.8.0"}
+embedded-hal-async = { version = "1.0.0"}
+embassy-executor-riot = { git = "https://gitlab.com/etonomy/riot-module-examples.git"}
+embassy-executor = { version = "0.5.0"}
+embedded-dtls = { git = "https://github.com/korken89/embedded-dtls.git", features = ["log"]}
+
+log = { version = "0.4", features = ["max_level_off"]}
+
+rust_riotmodules = { path = "../../sys/rust_riotmodules/" }
